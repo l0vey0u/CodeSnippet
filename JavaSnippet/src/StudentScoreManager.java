@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-
 public class StudentScoreManager {
 	private Scanner scan;
 	private static final int END_SIG_SCORE = 0;
@@ -44,11 +43,11 @@ public class StudentScoreManager {
 		}
 	}
 
-	public void printScoreData() {
-		
+	public void printScoreData(boolean useCustomAvg) {
+
 		LinkedList<Integer> scoreList;
-		double customTotal = 0.0;
-		double customAvg;
+		double TotalScore = 0.0;
+		double Avg;
 
 		int cnt = 0;
 		double topAvg = 0.0;
@@ -63,25 +62,32 @@ public class StudentScoreManager {
 			scoreList = std.getScoreList();
 			for (int scr : scoreList) {
 				System.out.print(scr + " ");
-				customTotal += scr;
+				TotalScore += scr;
 			}
-
-			customTotal -= std.getMax() + std.getMin();
-			customAvg = customTotal / (scoreList.size() - 2);
+			if (useCustomAvg) {
+				// Edit Code for Your Custom Avg
+				TotalScore -= std.getMax() + std.getMin();
+				Avg = TotalScore / (scoreList.size() - 2);
+			} else {
+				Avg = TotalScore / scoreList.size();
+			}
 			if (topStdName == null) {
 				topStdName = std.getName();
-				topAvg = customAvg;
+				topAvg = Avg;
 			} else {
-				if (customAvg > topAvg) {
+				if (Avg > topAvg) {
 					topStdName = std.getName();
-					topAvg = customAvg;
+					topAvg = Avg;
 				}
 			}
-			
-			System.out.printf("[%.2f] ( %d, %d 제외 %d개 )\n", customAvg, std.getMin(), std.getMax(),
-					scoreList.size() - 2);
 
-			customTotal = 0.0;
+			System.out.printf("[%.2f]", Avg);
+			// Notice Avg Info
+			if (useCustomAvg)
+				System.out.printf("( %d, %d 제외 %d개 )", std.getMin(), std.getMax(), scoreList.size() - 2);
+			System.out.println();
+
+			TotalScore = 0.0;
 		}
 
 		// TO DO : 공동 1등의 경우 처리
@@ -101,14 +107,16 @@ public class StudentScoreManager {
 	public static void main(String[] args) {
 		StudentScoreManager SSM = new StudentScoreManager();
 		SSM.inputScoreData();
-		SSM.printScoreData();
+		// printScoreData(boolean useCustomAvg)
+		SSM.printScoreData(true);
 		SSM.scan.close();
 	}
 
 }
 
 class Student {
-
+	private static final int EXCEL_SCORE_MAX = 45;
+	private static final int EXCEL_SCORE_MIN = 10;
 	private String name;
 	private int schlYear;
 	private LinkedList<Integer> scoreList;
@@ -124,8 +132,8 @@ class Student {
 	}
 
 	public boolean isGoodStudent() {
-		if (max >= 45)
-			if (min >= 10)
+		if (max >= EXCEL_SCORE_MAX)
+			if (min >= EXCEL_SCORE_MIN)
 				return true;
 		return false;
 	}
